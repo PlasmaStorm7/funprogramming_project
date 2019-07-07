@@ -1,7 +1,9 @@
 import ddf.minim.*;
+import ddf.minim.analysis.*;
 
 Minim minim;
 AudioPlayer player;
+FFT         fft;
 
 void setup()
 {
@@ -9,11 +11,13 @@ void setup()
   
   // we pass this to Minim so that it can load files from the data directory
   minim = new Minim(this);
-  
   // loadFile will look in all the same places as loadImage does.
   // this means you can find files that are in the data folder and the 
   // sketch folder. you can also pass an absolute path, or a URL.
   player = minim.loadFile("song.mp3");
+  
+  player.setGain(-15.0);
+  fft = new FFT( player.bufferSize(), player.sampleRate() );
 }
 
 void draw()
