@@ -7,32 +7,35 @@ FFT         fft;
 
 void setup()
 {
-  size(512, 200, P3D);
+  size(512, 400);
   
   // we pass this to Minim so that it can load files from the data directory
   minim = new Minim(this);
-  // loadFile will look in all the same places as loadImage does.
-  // this means you can find files that are in the data folder and the 
-  // sketch folder. you can also pass an absolute path, or a URL.
   player = minim.loadFile("song.mp3");
   
-  player.setGain(-15.0);
+  player.setGain(-18);
+  //player.loop();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
 }
 
 void draw()
 {
   background(0);
-  
-  
   if ( player.isPlaying() )
   {
-    text("Press any key to pause playback.", 10, 20 );
+    text("Press any key to pause playback.", width-181, height-19 );
   }
   else
   {
-    text("Press any key to start playback.", 10, 20 );
+    text("Press any key to start playback.", width-172, height-19 );
   }
+  
+  stroke( 255, 0, 0 );
+  float position = map( player.position(), 0, player.length(), 0, width );
+  line( position, 0, position, height );
+  
+  text("Click anywhere to jump to a position in the song.", width-259, height-5);
+  
 }
 
 void keyPressed()
@@ -52,4 +55,11 @@ void keyPressed()
   {
     player.play();
   }
+}
+void mousePressed()
+{
+  // choose a position to cue to based on where the user clicked.
+  // the length() method returns the length of recording in milliseconds.
+  int position = int( map( mouseX, 0, width, 0, player.length() ) );
+  player.cue( position );
 }
