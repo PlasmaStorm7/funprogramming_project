@@ -62,7 +62,7 @@ void draw()
        band=lerp(v[i],band,lerpAmt);             
       } 
       
-     rect(i*3,height-21,i*3+1,height-21-band,1);
+     rect(i*3,height-21,i*3+1,height-21-band);
       
      v[i]=band;
   }
@@ -91,8 +91,8 @@ void keyPressed()
   {
     player.pause();
   }
-  else if ( player.position() == songLength )
-  {
+  else if ( player.position() >= songLength-20 )
+  { 
     player.rewind();
     player.play();
   }
