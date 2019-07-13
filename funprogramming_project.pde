@@ -5,20 +5,21 @@ Minim minim;
 AudioPlayer player;
 FFT         fft;
 int songLength;
-float multiplication =6f;
+float multiplication =10;
 float band;
-
-float v[]=new float[1024];
-float lerpAmt=0.09f;
+float playerRotation=0;
+float v[]=new float[4096];
+float lerpAmt=0.06f;
 float j=0;
-float jPlus=-0.005;
+float jPlus=0.001;
+float bandMax=0;
 void setup()
 {
   size(1024, 400);
   
   // we pass this to Minim so that it can load files from the data directory
   minim = new Minim(this);
-  player = minim.loadFile("song.mp3",1024);
+  player = minim.loadFile("song.mp3",512);
   frameRate(60);
   player.setGain(-18);
   player.play();
@@ -38,8 +39,6 @@ void setup()
 void draw()
 {
   background(0);
-  // rotate(j);
-  //j=j+jPlus;
   fft.forward(player.mix);
   stroke(255);
   rectMode(CORNERS);
@@ -50,23 +49,52 @@ void draw()
   float position = map( player.position(), 0, songLength, 0, width );
   rect(1,height-19,position,height);
   
-  println(player.getGain());
-  
   stroke(60,0,60);
   fill(60,0,60);
   
-  for(int i=0; i < fft.specSize(); i++){
-    band=fft.getBand(i)*multiplication;
+  //for(int i=0; i < fft.specSize(); i++){
+  //  band=fft.getBand(i)*multiplication;
+  //  if (band<v[i])
+  //    {        
+  //     band=lerp(v[i],band,lerpAmt);             
+  //    } 
+      
+  //   rect(i*3,height-21,i*3+1,height-21-band);
+      
+  //   v[i]=band;
+  //}
+  pushMatrix();
+  translate(width/2,height/2);
+  stroke(100,0,100);
+  fill(100,0,100);
+  playerRotation=0+j;
+  
+  j+=bandMax/20000;
+  bandMax=0;
+  
+  for(int i=0; i < fft.specSize(); i++)
+  {
+    if (bandMax<fft.getBand(i))
+    {
+     bandMax=fft.getBand(i); 
+    }
+       band=fft.getBand(i)*multiplication;
     if (band<v[i])
       {        
        band=lerp(v[i],band,lerpAmt);             
       } 
-      
-     rect(i*3,height-21,i*3+1,height-21-band);
-      
+    rotate(playerRotation-j);
+    arc(0,0,band,band,0,HALF_PI/fft.specSize(),PIE);
+    //arc(0,0,band,band,-HALF_PI/fft.specSize(),0,PIE);
+    playerRotation=playerRotation+(HALF_PI/((fft.specSize()-1)*2));
+    
+    
+  
      v[i]=band;
   }
   
+  
+  popMatrix();
  
   
   
