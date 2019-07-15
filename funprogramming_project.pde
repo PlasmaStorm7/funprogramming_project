@@ -15,7 +15,7 @@ float jPlus=0.001;
 float bandMax=0;
 void setup()
 {
-  size(1024, 400);
+  size(1024, 600);
   
   // we pass this to Minim so that it can load files from the data directory
   minim = new Minim(this);
@@ -79,14 +79,14 @@ void draw()
     {
      bandMax=fft.getBand(i); 
     }
-       band=fft.getBand(i)*multiplication;
-    if (band<v[i])
+       band=map(fft.getBand(i)*multiplication,0,200,0,20);
+    if (band<v[i]) //<>//
       {        
        band=lerp(v[i],band,lerpAmt);             
       } 
     rotate(playerRotation);
     rectMode(CORNERS);
-    rect(0,20,1,20+band);
+    //rect(0,20,1,20+band);
     playerRotation=PI/fft.specSize();
      v[i]=band;
   }
