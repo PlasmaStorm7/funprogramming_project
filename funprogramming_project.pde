@@ -9,7 +9,7 @@ float multiplication =5;
 float band;
 float playerRotation=0;
 float v[]=new float[4096];
-float lerpAmt=0.06f;
+float lerpAmt=0.09f;
 float j=PI;
 float bandMax=0;
 float circle=200;
@@ -17,18 +17,26 @@ int change = 1;
 boolean changeRequired = false;
 float rotationChangeThreshold = 10;
 float bandMedian=0;
+int bands=0;
+String fileName;
 void setup()
 {
   size(1024, 600);
-
-  // we pass this to Minim so that it can load files from the data directory
+  //fullScreen();
+  selectInput("Select a file to process:", "fileSelected");
   minim = new Minim(this);
-  player = minim.loadFile("song3.mp3", 256);
+  //player = minim.loadFile("song3.mp3", 256);
+  
   frameRate(60);
-  player.setGain(-18);
+  while(fileName==null)
+  {
+    println("waiting");
+  }
+  player=minim.loadFile(fileName,256);
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
-
+  bands=int(fft.specSize()*0.8);
+player.setGain(-18);
   player.cue(player.length());
   println(player.position());
   songLength=player.position();
@@ -45,15 +53,7 @@ void draw()
 {
   background(0);
   fft.forward(player.mix);
-  fill(0);
-  stroke(255);
-  rect(1, height-20,width, height);
-  noStroke();
-  rectMode(CORNERS);
-  //line(0, height-20, width, height-20);
-  fill(255, 0, 0);
-  float position = map( player.position(), 0, songLength, 0, width );
-  rect(1, height-19, position, height);
+  
 
   stroke(60, 0, 60);
   fill(60, 0, 60);
@@ -68,16 +68,16 @@ void draw()
   //   rect(i*3,height-21,i*3+1,height-21-band);
   //}
   bandMedian=0;
-  for(int i=0; i < fft.specSize(); i++){
+  for(int i=0; i < bands; i++){
      bandMedian+=v[i];
   }
-  bandMedian=bandMedian/fft.specSize();
+  bandMedian=bandMedian/bands;
   pushMatrix();
   translate(width/2, height/2-20);
   stroke(100, 0, 100);
   fill(100, 0, 100);
   rotate(j);
-    j+=bandMax/2000;
+    j+=bandMax/4000;
   //j+=(bandMedian*change)/20000;
   //if (bandMedian > rotationChangeThreshold)
   //  changeRequired = true;
@@ -88,7 +88,7 @@ void draw()
   //}
   bandMax=0;
 
-  for (int i=0; i < fft.specSize(); i++)
+  for (int i=0; i < bands; i++)
   {
 
     if (bandMax<fft.getBand(i))
@@ -100,24 +100,26 @@ void draw()
     {        
       band=lerp(v[i], band, lerpAmt);
     }
+    stroke(90+map(band,0,200,0,165),0,map(i,bands,0,0,255));
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=PI/fft.specSize();
+    playerRotation=PI/bands;
     v[i]=band;
   }
 
-  for (int i=fft.specSize(); i>0; i--)
+  for (int i=bands; i>0; i--)
   {
     band=mapBand(fft.getBand(i));
     if (band<v[i])
     {        
       band=lerp(v[i], band, lerpAmt);
     } 
+    stroke(90+map(band,0,200,0,165),0,map(i,bands,0,0,255));
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=PI/fft.specSize();
+    playerRotation=PI/bands;
   }
   
   //noFill();
@@ -126,6 +128,15 @@ void draw()
   //rotationChangeThreshold = lerp(rotationChangeThreshold, bandMedian*2, 0.0001);
   popMatrix();
 
+fill(0);
+  stroke(255);
+  rect(1, height-20,width, height);
+  noStroke();
+  rectMode(CORNERS);
+  //line(0, height-20, width, height-20);
+  fill(255, 0, 0);
+  float position = map( player.position(), 0, songLength, 0, width );
+  rect(1, height-19, position, height);
 
 
 
@@ -169,4 +180,16 @@ void mousePressed()
 float mapBand(float band)
 {
   return constrain(log(band) / log(2), 0, width) * 15;
+  //return constrain (map(band*15,0,300,0,200),0,500);
+}
+
+void fileSelected(File selection) {
+  if (selection == null) {
+    println("Window was closed or the user hit cancel.");
+  } else {
+    println("User selected " + selection.getAbsolutePath());
+    fileName=selection.getAbsolutePath();
+    
+    
+  }
 }
