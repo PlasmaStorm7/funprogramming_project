@@ -34,6 +34,7 @@ void setup()
   for(int i=0; i < fft.specSize(); i++){
      v[i]=0;
   }
+  pushMatrix();
 }
 
 void draw()
@@ -83,18 +84,33 @@ void draw()
       {        
        band=lerp(v[i],band,lerpAmt);             
       } 
-    rotate(playerRotation-j);
-    arc(0,0,band,band,0,HALF_PI/fft.specSize(),PIE);
-    //arc(0,0,band,band,-HALF_PI/fft.specSize(),0,PIE);
-    playerRotation=playerRotation+(HALF_PI/((fft.specSize()-1)*2));
-    
-    
-  
+    rotate(playerRotation);
+    rectMode(CORNERS);
+    rect(0,20,1,20+band);
+    playerRotation=PI/fft.specSize();
+     v[i]=band;
+  }
+  for(int i=fft.specSize(); i>0 ; i--)
+  {
+    if (bandMax<fft.getBand(i))
+    {
+     bandMax=fft.getBand(i); 
+    }
+       band=fft.getBand(i)*multiplication;
+    if (band<v[i])
+      {        
+       band=lerp(v[i],band,lerpAmt);             
+      } 
+    rotate(playerRotation);
+    rectMode(CORNERS);
+    rect(0,20,1,20+band);
+    playerRotation=PI/fft.specSize();
      v[i]=band;
   }
   
   
-  popMatrix();
+  
+  popMatrix(); //<>//
  
   
   
