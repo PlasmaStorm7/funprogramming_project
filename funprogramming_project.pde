@@ -25,14 +25,14 @@ void setup()
   //fullScreen();
   selectInput("Select a file to process:", "fileSelected");
   minim = new Minim(this);
-  //player = minim.loadFile("song3.mp3", 256);
-  
   frameRate(60);
+  
   while(fileName==null)
   {
     println("waiting");
   }
   player=minim.loadFile(fileName,256);
+  
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
   bands=int(fft.specSize()*0.8);
