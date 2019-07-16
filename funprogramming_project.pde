@@ -8,8 +8,8 @@ int songLength;
 float multiplication =5;
 float band;
 float playerRotation=0;
-float v[]=new float[4096];
-float lerpAmt=0.09f;
+float v[]=new float[1025];
+float lerpAmt=0.04f;
 float j=PI;
 float bandMax=0;
 float circle=200;
@@ -19,9 +19,11 @@ float rotationChangeThreshold = 10;
 float bandMedian=0;
 int bands=0;
 String fileName;
+float rotateDivider=1000;
+float bandsPercentage=0.9;
 void setup()
 {
-  size(1024, 600);
+  size(1024, 700);
   //fullScreen();
   selectInput("Select a file to process:", "fileSelected");
   minim = new Minim(this);
@@ -31,11 +33,10 @@ void setup()
   {
     println("waiting");
   }
-  player=minim.loadFile(fileName,256);
-  
+  player=minim.loadFile(fileName,1024);
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
-  bands=int(fft.specSize()*0.8);
+  bands=int(fft.specSize()*bandsPercentage);
 player.setGain(-18);
   player.cue(player.length());
   println(player.position());
@@ -77,7 +78,10 @@ void draw()
   stroke(100, 0, 100);
   fill(100, 0, 100);
   rotate(j);
-    j+=bandMax/4000;
+  if(player.isPlaying())
+  rotateDivider=lerp(rotateDivider,bandMedian*40,0.01); //<>//
+    j+=bandMedian/rotateDivider;
+    
   //j+=(bandMedian*change)/20000;
   //if (bandMedian > rotationChangeThreshold)
   //  changeRequired = true;
@@ -153,21 +157,41 @@ fill(0);
 }
 
 void keyPressed()
-{
-  if ( player.isPlaying() )
-  {
-    player.pause();
-  } else if ( player.position() >= songLength-20 )
-  { 
-    player.rewind();
+{ 
+  if (key=='m'||key=='M')
+    {
+      player.pause();
+      fileName=null;
+      selectInput("Select a file to process:", "fileSelected");
+      while(fileName==null)
+      {
+        println("waiting");
+      }
+      player=minim.loadFile(fileName,256);
+      player.setGain(-18);
+      player.cue(player.length());
+    println(player.position());
+    songLength=player.position();
+    player.cue(0);
     player.play();
-  }
+    }
+    else
+  if ( player.isPlaying() &&(key=='p'||key=='P'))
+    {
+      player.pause();
+    } 
+    else 
+      if ( player.position() >= songLength-20 )
+        { 
+        player.rewind();
+        player.play();
+        }
   // if the player is at the end of the file,
   // we have to rewind it before telling it to play again
-  else 
-  {
-    player.play();
-  }
+        else if(key=='p'||key=='P' )
+          {
+            player.play();
+          }
 }
 
 void mousePressed()
