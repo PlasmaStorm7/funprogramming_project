@@ -20,7 +20,8 @@ float bandMedian=0;
 int bands=0;
 String fileName;
 float rotateDivider=1000;
-float bandsPercentage=1;
+float bandsPercentage=0.85;
+int bandResolution=1024;
 void setup()
 {
   size(1024, 700);
@@ -33,12 +34,12 @@ void setup()
   {
     println("waiting");
   }
-  player=minim.loadFile(fileName,1024);
+  player=minim.loadFile(fileName,bandResolution);
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
   bands=int(fft.specSize()*bandsPercentage);
 player.setGain(-18);
-  player.cue(player.length());
+  player.cue(player.length()); //<>//
   println(player.position());
   songLength=player.position();
   player.cue(0);
@@ -80,8 +81,8 @@ void draw()
   fill(100, 0, 100);
   rotate(j);
   if(player.isPlaying())
-  rotateDivider=lerp(rotateDivider,bandMedian*100,0.001); //<>//
-    j+=bandMedian/rotateDivider;
+  rotateDivider=lerp(rotateDivider,bandMax*50,0.01); //<>//
+    j+=bandMax/rotateDivider;
     
   //j+=(bandMedian*change)/20000;
   //if (bandMedian > rotationChangeThreshold)
@@ -93,7 +94,7 @@ void draw()
   //}
   bandMax=0;
 
-  for (int i=0; i < bands; i++)
+  for (int i=0; i < bands; i+=4)
   {
 
     if (bandMax<fft.getBand(i))
@@ -109,11 +110,11 @@ void draw()
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=PI/bands;
-    v[i]=band;
+    playerRotation=(PI/bands)*4;
+    
   }
 
-  for (int i=bands; i>0; i--)
+  for (int i=bands; i>=0; i-=4)
   {
     band=mapBand(fft.getBand(i));
     if (band<v[i])
@@ -124,7 +125,9 @@ void draw()
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=PI/bands;
+    playerRotation=(PI/bands)*4;
+    v[i]=band;
+   
   }
   
   //noFill();
@@ -149,12 +152,13 @@ fill(0);
   fill(255);
   if ( player.isPlaying() )
   {
-    text("Press any key to pause playback.", width-181, height-40 );
+    text("Press the P key to pause playback.", width-191, height-40 );
   } else
   {
-    text("Press any key to start playback.", width-172, height-40 );
+    text("Press the P key to start playback.", width-182, height-40 );
   }
   text("Click anywhere to jump to a position in the song.", width-259, height-25);
+  text("Press the M key to choose another song.",width-220,height-55);
 }
 
 void keyPressed()
@@ -163,12 +167,13 @@ void keyPressed()
     {
       player.pause();
       fileName=null;
+      player.close();
       selectInput("Select a file to process:", "fileSelected");
       while(fileName==null)
       {
         println("waiting");
       }
-      player=minim.loadFile(fileName,256);
+      player=minim.loadFile(fileName,bandResolution);
       fft = new FFT( player.bufferSize(), player.sampleRate() );
       player.setGain(-18);
       player.cue(player.length());
