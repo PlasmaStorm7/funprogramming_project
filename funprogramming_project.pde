@@ -20,7 +20,7 @@ float bandMedian=0;
 int bands=0;
 String fileName;
 float rotateDivider=1000;
-float bandsPercentage=0.9;
+float bandsPercentage=1;
 void setup()
 {
   size(1024, 700);
@@ -55,6 +55,7 @@ void draw()
   background(0);
   fft.forward(player.mix);
   
+  
 
   stroke(60, 0, 60);
   fill(60, 0, 60);
@@ -79,7 +80,7 @@ void draw()
   fill(100, 0, 100);
   rotate(j);
   if(player.isPlaying())
-  rotateDivider=lerp(rotateDivider,bandMedian*40,0.01); //<>//
+  rotateDivider=lerp(rotateDivider,bandMedian*100,0.001); //<>//
     j+=bandMedian/rotateDivider;
     
   //j+=(bandMedian*change)/20000;
@@ -168,6 +169,7 @@ void keyPressed()
         println("waiting");
       }
       player=minim.loadFile(fileName,256);
+      fft = new FFT( player.bufferSize(), player.sampleRate() );
       player.setGain(-18);
       player.cue(player.length());
     println(player.position());
