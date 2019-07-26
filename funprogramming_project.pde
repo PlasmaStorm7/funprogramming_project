@@ -1,4 +1,4 @@
-import ddf.minim.*; //<>// //<>//
+import ddf.minim.*; //<>//
 import ddf.minim.analysis.*;
 
 Minim minim;
@@ -18,29 +18,31 @@ boolean changeRequired = false;
 float rotationChangeThreshold = 10;
 float bandMedian=0;
 int bands=0;
-String fileName;
+String fileName=null;
 float rotateDivider=1000;
 float bandsPercentage=0.85;
 int bandResolution=1024;
 void setup()
 {
   size(1024, 700);
-  //fullScreen();
-  selectInput("Select a file to process:", "fileSelected");
-  minim = new Minim(this);
   frameRate(60);
+  //fullScreen();
+  
+  selectInput("Select a file to process:", "fileSelected");
   
   while(fileName==null)
   {
     println("waiting");
   }
   println(fileName);
+  minim = new Minim(this);
   player=minim.loadFile(fileName,bandResolution);
-  player.play();
+  println("loaded "+ fileName);
   fft = new FFT( player.bufferSize(), player.sampleRate() );
+  player.play(); //<>//
   bands=int(fft.specSize()*bandsPercentage);
 player.setGain(-18);
-  player.cue(player.length()); //<>//
+  player.cue(player.length());
   println(player.position());
   songLength=player.position();
   player.cue(0);
@@ -82,7 +84,7 @@ void draw()
   fill(100, 0, 100);
   rotate(j);
   if(player.isPlaying())
-  rotateDivider=lerp(rotateDivider,bandMax*50,0.01); //<>//
+  rotateDivider=lerp(rotateDivider,bandMax*50,0.01);
     j+=bandMax/rotateDivider;
     
   //j+=(bandMedian*change)/20000;
@@ -223,7 +225,7 @@ void fileSelected(File selection) {
     fileName=selection.getAbsolutePath();
     
     
-  } //<>//
+  }
 }
 
 public void close()
