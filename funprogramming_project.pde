@@ -24,9 +24,10 @@ float rotateDivider=1000;
 float bandsPercentage=0.8;
 int bandResolution=2048;
 int bandsSkipped=8;
-int gain=-16;
-int gainPosition=gain;
+float gain=-16;
+float gainPosition=gain;
 int k=0;
+float gainCue=gain;
 void setup()
 {
   //size(1024, 700);
@@ -141,9 +142,11 @@ void draw()
   fill(255, 0, 0);
   float position = map( player.position(), 0, songLength, 0, width-30 );
   rect(1, height-19, position, height);
-  
-  gainPosition=int(map(gain,-18,0,height,0));
-  rect(width-30,height,width,gainPosition);
+  if(gain!=gainCue)
+  {
+    gain=lerp(gain,gainCue,0.05);
+  }
+  rect(width-30,height,width,map(gain,-18,0,height,0));
   
 
   fill(255);
@@ -171,8 +174,8 @@ void mousePressed()
   else
   if(mouseX>width-30)
   {
-    int gainCue = int(map(mouseY,height,0,-18,0));
+    gainCue = int(map(mouseY,height,0,-18,0));
     player.shiftGain(gain,gainCue,1000);
-    gain=gainCue;
+    
   }
 }
