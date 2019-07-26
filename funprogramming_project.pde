@@ -38,12 +38,14 @@ void setup()
   minim = new Minim(this);
   player=minim.loadFile(fileName,bandResolution);
   println("loaded "+ fileName);
+  println("player.bufferSize()="+player.bufferSize());
+  println("player.sampleRate()="+player.sampleRate());
   fft = new FFT( player.bufferSize(), player.sampleRate() );
   player.play(); //<>//
   bands=int(fft.specSize()*bandsPercentage);
 player.setGain(-18);
   player.cue(player.length());
-  println(player.position());
+  println("player.position()="+player.position() );
   songLength=player.position();
   player.cue(0);
   //println("length is "+songLength+"/"+player.length()+"metadata length is"+player.getMetaData().length());
