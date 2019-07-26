@@ -1,4 +1,4 @@
-import ddf.minim.*; //<>//
+import ddf.minim.*; //<>// //<>//
 import ddf.minim.analysis.*;
 
 Minim minim;
@@ -41,9 +41,10 @@ void setup()
   println("player.bufferSize()="+player.bufferSize());
   println("player.sampleRate()="+player.sampleRate());
   fft = new FFT( player.bufferSize(), player.sampleRate() );
-  player.play(); //<>//
+  player.play(); //<>// //<>//
   bands=int(fft.specSize()*bandsPercentage);
 player.setGain(-18);
+
   player.cue(player.length());
   println("player.position()="+player.position() );
   songLength=player.position();
