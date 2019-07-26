@@ -36,6 +36,7 @@ void setup()
   {
     println("waiting");
   }
+  println(fileName);
   player=minim.loadFile(fileName,bandResolution);
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
@@ -169,7 +170,7 @@ void keyPressed()
     {
       player.pause();
       fileName=null;
-      player.close();
+      close();
       selectInput("Select a file to process:", "fileSelected");
       while(fileName==null)
       {
@@ -224,5 +225,13 @@ void fileSelected(File selection) {
     fileName=selection.getAbsolutePath();
     
     
-  }
+  } //<>//
+}
+
+public void close()
+{
+    Minim.debug( "Closing " + this.toString() );
+ 
+    player.close();
+    
 }
