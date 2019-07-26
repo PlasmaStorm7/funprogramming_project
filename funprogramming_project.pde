@@ -8,7 +8,7 @@ int songLength;
 float multiplication =5;
 float band;
 float playerRotation=0;
-float v[]=new float[1027];
+float v[]=new float[1025];
 float lerpAmt=0.04f;
 float j=PI;
 float bandMax=0;
@@ -20,10 +20,8 @@ float bandMedian=0;
 int bands=0;
 String fileName;
 float rotateDivider=1000;
-float bandsPercentage=0.75;
+float bandsPercentage=0.85;
 int bandResolution=1024;
-int bandsSkipped=4;
-float gain= -10;
 void setup()
 {
   size(1024, 700);
@@ -41,7 +39,7 @@ void setup()
   player.play();
   fft = new FFT( player.bufferSize(), player.sampleRate() );
   bands=int(fft.specSize()*bandsPercentage);
-player.setGain(gain);
+player.setGain(-18);
   player.cue(player.length()); //<>//
   println(player.position());
   songLength=player.position();
@@ -97,7 +95,7 @@ void draw()
   //}
   bandMax=0;
 
-  for (int i=0; i < bands; i+=bandsSkipped)
+  for (int i=0; i < bands; i+=4)
   {
 
     if (bandMax<fft.getBand(i))
@@ -113,11 +111,11 @@ void draw()
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=(PI/bands)*bandsSkipped;
-    v[i]=band;
+    playerRotation=(PI/bands)*4;
+    
   }
 
-  for (int i=bands; i>0; i-=bandsSkipped)
+  for (int i=bands; i>=0; i-=4)
   {
     band=mapBand(fft.getBand(i));
     if (band<v[i])
@@ -128,7 +126,7 @@ void draw()
     rotate(playerRotation);
     rectMode(CORNERS);
     rect(0, circle, 1, circle+band);
-    playerRotation=(PI/bands)*bandsSkipped;
+    playerRotation=(PI/bands)*4;
     v[i]=band;
    
   }
@@ -178,7 +176,7 @@ void keyPressed()
       }
       player=minim.loadFile(fileName,bandResolution);
       fft = new FFT( player.bufferSize(), player.sampleRate() );
-      player.setGain(gain);
+      player.setGain(-18);
       player.cue(player.length());
     println(player.position());
     songLength=player.position();
@@ -213,7 +211,7 @@ void mousePressed()
 
 float mapBand(float band)
 {
-  return constrain((log(band)*1.5) / log(2), 0, width) * 15;
+  return constrain(log(band) / log(2), 0, width) * 15;
   //return constrain (map(band*15,0,300,0,200),0,500);
 }
 
