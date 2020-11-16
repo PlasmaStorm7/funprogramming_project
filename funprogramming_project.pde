@@ -8,7 +8,7 @@ int songLength;
 float multiplication =5;
 float band;
 int bandResolution=4096;
-int bandsSkipped=2;
+int bandsSkipped=4;
 float gain=-16;
 float gainPosition=gain;
 int k=0;
